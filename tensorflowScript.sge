@@ -1,0 +1,50 @@
+
+## NOTE: This script must be in the SAME direcotry as the python script
+
+## Leave Unchanged ----------------------------------------------
+#$ -S /bin/bash
+#$ -V
+
+#$ -m n
+#$ -cwd
+
+##Output file for stdout and stderr
+#$ -j y -o $JOB_NAME.out -e $JOB_NAME.err
+
+##---------------------------------------------------------------
+
+##Array job (2 tasks for this job, with SGE_TASK_ID from 1 to 1):
+##Therefore two versions of this scirpt will run, with two different SGE_TASK_ID
+
+#$ -t 1-1:1
+
+##---------------------------------------------------------------
+## GPU Job using 1 CPU cores
+#$ -pe gpu 1
+
+##---------------------------------------------------------------
+## This details which GPU and how many to use
+## NOTE: num_GTXany_per_task has to equal the same number as 
+##		 num_GTX980_per_task or num_GTX1080_per_task.
+
+#$ -l num_GTXany_per_task=2
+#$ -l num_GTX1080_per_task=2
+
+
+##---------------------------------------------------------------
+
+dateAndTime=`date +%Y%m%d-%H%M%S`
+launched=`date +%s`
+let minutesApproxHalfMax=4*60 
+
+##Enter the name of the program you are running here
+PROGRAM='train_fold.py'
+
+##If you need to pass any arguments place them here
+ARGUMENTS=''
+
+##This runs the python script and produces two output files 
+python ./${PROGRAM} ${ARGUMENTS} > ${PROGRAM}_${SGE_TASK_ID}.out 2>${PROGRAM}_${SGE_TASK_ID}.err
+
+## Produces a log file so you can see where the program ran and how long for
+echo Task $SGE_TASK_ID running on `hostname` at `date +%H:%M:%S' on '%d%b%Y' : '%s' seconds'` &>>${PROGRAM}.log

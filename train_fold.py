@@ -16,19 +16,25 @@ from Get_Available_Gpus import get_available_gpus
 import numpy as np
 
 gpus = get_available_gpus(1)
+
+
+train_path = '/home/bappaditya/Sapna/Rasti_data/train'
+test_path = ''
+val_path = '/home/bappaditya/Sapna/Rasti_data/val'
+
 with tf.device(gpus[0]):
-    DAM = Multi_DAM(classes = 4, hidden_dim = 512)
+    DAM = Multi_DAM(classes = 3, hidden_dim = 512)
     custom_dual_att_model = DAM.model()
     opt =SGD(lr=0.001)    
     custom_dual_att_model.compile(loss="categorical_crossentropy",
                   optimizer=opt,
                   metrics=['accuracy'])
     import_images = import_images()
-    train_image = import_images.import_images_from_folder('/home/bappaditya/Sapna/Rasti_data/train')  
+    train_image = import_images.import_images_from_folder(train_path)
     tr_labels = [i[1] for i in train_image]
     tr_img_data_l = list([i[0] for i in train_image])
 
-    test_image = import_images.import_images_from_folder('/home/bappaditya/Sapna/Rasti_data/val')
+    test_image = import_images.import_images_from_folder(val_path)
     test_labels = [i[1] for i in test_image]
     test_img_data_l = list([i[0] for i in test_image])
 
